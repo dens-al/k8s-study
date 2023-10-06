@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: multitool
+  name: pod2-multitool-default
+spec:
+  containers:
+    - name: network-multitool
+      image: wbitt/network-multitool
+      env:
+        - name: HTTP_PORT
+          value: "8080"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-multitool-default
+spec:
+  ports:
+    - name: multitool-http
+      protocol: TCP
+      port: 80
+      targetPort: 8080
+  selector:
+    app: multitool

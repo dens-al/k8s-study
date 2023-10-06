@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: nginx
+  name: pod-nginx2-default
+spec:
+  containers:
+    - name: nginx
+      image: nginx:1.18
+      ports:
+        - containerPort: 80
+          name: web
+          protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-nginx2-default
+spec:
+  ports:
+    - name: web
+      port: 80
+  selector:
+    app: nginx
