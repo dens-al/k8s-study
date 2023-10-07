@@ -26,7 +26,7 @@ jobs:
         id: kube-lint-scan
         uses: stackrox/kube-linter-action@v1
         with:
-          directory: 01.pods  
+          directory: ../../ #.github/workflows/01.pods  
 #          config: .kube-linter/config.yaml
       - name: Run a one-line script
         run: ls -la
