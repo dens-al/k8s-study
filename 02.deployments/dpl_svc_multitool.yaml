@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: app
-  namespace: default
+  namespace: lesson2
 spec:
   replicas: 4
   selector:

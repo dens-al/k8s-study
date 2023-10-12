@@ -6,7 +6,7 @@ metadata:
 spec:
   containers:
   - name: nginx
-    image: nginx:1.9
+    image: nginx:1.19
     readinessProbe:
       httpGet:
         path: /
@@ -14,5 +14,5 @@ spec:
       initialDelaySeconds: 3  # wait 3 sec before run probe
       periodSeconds: 3        # period exec 3 sec
       timeoutSeconds: 1       # wait 1 sec after exec
-      failureThreshold: 4     # 4 attempts | if not working getting out from LB
+      failureThreshold: 1     # 4
       successThreshold: 2     # after 2 success answer

@@ -1,28 +1,30 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    app: multitool
-  name: multitool
-  namespace: default
+  name: dpl-nginx
+  namespace: lesson2
 spec:
   replicas: 4
   selector:
     matchLabels:
-      app: multitool
+      app: web
   template:
     metadata:
       labels:
-        app: multitool
+        app: web
     spec:
       containers:
-        - image: nginx:1.19.1
-          imagePullPolicy: IfNotPresent
+        - image: nginx:1.19.2
           name: nginx
-          resources:
-            limits:
-              cpu: 200m
-              memory: 512Mi
-            requests:
-              cpu: 100m
-              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dpl-nginx-svc
+  namespace: lesson2
+spec:
+  ports:
+    - name: web
+      port: 80
+  selector:
+    app: web
