@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluentd-elasticsearch
+spec:
+  selector:
+    matchLabels:
+      app: fluentd-elasticsearch
+  template:
+    metadata:
+      labels:
+        app: fluentd-elasticsearch
+    spec:
+      containers:
+        - name: fluentd-elasticsearch
+          image: "quay.io/fluentd_elasticsearch/fluentd:v2.5.2"
