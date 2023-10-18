@@ -2,9 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: app
-  namespace: lesson2
+  namespace: lesson3
 spec:
-  replicas: 4
+  replicas: 3
   selector:
     matchLabels:
       app: myapp
@@ -14,22 +14,9 @@ spec:
         app: myapp
     spec:
       containers:
-      - image: nginx:1.19.2
-        imagePullPolicy: IfNotPresent
-        name: nginx
       - image: praqma/network-multitool:alpine-extra
         imagePullPolicy: IfNotPresent
         name: multitool
-        env:
-          - name: HTTP_PORT
-            value: "8080"
-        lifecycle:
-          postStart:
-            exec:
-              command: ["sleep", "10"]
-          preStop:
-            exec:
-              command: ["sleep", "30"]
 ---
 apiVersion: v1
 kind: Service
