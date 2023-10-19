@@ -7,7 +7,7 @@ spec:
   ports:
     - name: web
       port: 80
-      nodePort: 32181
+      nodePort: 30080
   selector:
     app: web
   type: NodePort
