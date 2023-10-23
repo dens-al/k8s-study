@@ -17,14 +17,15 @@ spec:
                 name: web-svc
                 port:
                   name: web
-          - path: /api
+          - path: /app
             pathType: Prefix
             backend:
               service:
                 name: app-svc
                 port:
-                  name: web
-#  tls:
-#    - hosts:
-#        - ingress.almuhametov.com
-#      secretName: akop
+                  name: app
+
+  tls:
+    - hosts:
+        - ingress.almuhametov.com
+      secretName: tls-secret

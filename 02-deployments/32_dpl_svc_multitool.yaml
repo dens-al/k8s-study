@@ -24,7 +24,7 @@ metadata:
   namespace: lesson4
 spec:
   ports:
-    - name: web
+    - name: app
       port: 80
   selector:
     app: myapp
