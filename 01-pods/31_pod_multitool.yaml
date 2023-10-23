@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-multitool
+  namespace: lesson4
+spec:
+  containers:
+    - name: network-multitool
+      image: wbitt/network-multitool
+## https://github.com/wbitt/Network-MultiTool

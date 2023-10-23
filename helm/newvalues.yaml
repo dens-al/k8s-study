@@ -1,0 +1,4 @@
+image:
+  tag: 1.22
+service:
+  type: NodePort
