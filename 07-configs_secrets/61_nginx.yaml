@@ -3,13 +3,10 @@ kind: Pod
 metadata:
   name: web-server
   namespace: lesson7
-  labels:
-    app: web-server
 spec:
   containers:
     - name: web-server
       image: nginx:1.19
-      imagePullPolicy: IfNotPresent
       volumeMounts:
         - name: config-volume
           mountPath: /etc/nginx

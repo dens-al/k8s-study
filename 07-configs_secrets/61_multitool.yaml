@@ -26,13 +26,14 @@ metadata:
   name: my-configmap
   namespace: lesson7
 data:
-  key1: "Hello netology guys! In God we trust"
+  key1: "Hello netology guys!"
   key2: |
     Test
     multiple lines
     more lines
     some more lines
     super cool lines
+    need more lines
 ---
 apiVersion: v1
 kind: Secret
