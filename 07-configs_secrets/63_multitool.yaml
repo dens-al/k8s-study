@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: multitool-env-all
+  namespace: lesson7
+spec:
+  containers:
+    - image: wbitt/network-multitool
+      name: multitool
+      envFrom:
+        - configMapRef:
+            name: my-configmap
+        - secretRef:
+            name: my-secret

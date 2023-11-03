@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-server
+  namespace: lesson7
+  labels:
+    app: web-server
+spec:
+  containers:
+    - name: web-server
+      image: nginx:1.19
+      imagePullPolicy: IfNotPresent
+      volumeMounts:
+        - name: config-volume
+          mountPath: /etc/nginx
+        - name: secret-volume
+          mountPath: /etc/nginx/conf
+  volumes:
+    - name: config-volume
+      configMap:
+        name: nginx-configuration
+    - name: secret-volume
+      secret:
+        secretName: nginx-secret
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-configuration
+  namespace: lesson7
+data:
+  nginx.conf: |
+    user  nginx;
+    worker_processes  1;
+
+    error_log  /var/log/nginx/error.log warn;
+    pid        /var/run/nginx.pid;
+
+    events {
+      worker_connections  1024;
+    }
+    http {
+        server {
+            listen       80;
+            listen  [::]:80;
+            server_name  localhost;
+            location / {
+                root   /usr/share/nginx/html;
+                index  index.html index.htm;
+            }
+            auth_basic "Secure Site";
+            auth_basic_user_file conf/.htpasswd;
+        }
+    }
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: nginx-secret
+  namespace: lesson7
+type: Opaque
+data:
+  .htpasswd: YWRtaW46JGFwcjEkallGMmNYdXgkRUxiczlSU3NmdzBIYnFwSXFtc3J6MQo= #admin:netology

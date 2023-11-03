@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: multitool-vol
+  namespace: lesson7
+spec:
+  containers:
+    - image: wbitt/network-multitool
+      name: multitool
+      volumeMounts:
+        - name: config-volume
+          mountPath: /etc/config/config
+        - name: secret-volume
+          mountPath: /etc/config/secret
+  volumes:
+    - name: config-volume
+      configMap:
+        name: my-configmap
+    - name: secret-volume
+      secret:
+        secretName: my-secret
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-configmap
+  namespace: lesson7
+data:
+  key1: "Hello netology guys! In God we trust"
+  key2: |
+    Test
+    multiple lines
+    more lines
+    some more lines
+    super cool lines
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: my-secret
+  namespace: lesson7
+type: Opaque
+data:
+  username: YWRtaW4K # admin
+  password: bmV0b2xvZ3kK # netology
