@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: startup-pod-cmd
+  name: pod-startup
   namespace: lesson2
 spec:
   containers:

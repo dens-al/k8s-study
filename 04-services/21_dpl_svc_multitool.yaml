@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app
+  name: dpl-multitool
   namespace: lesson3
 spec:
   replicas: 3
@@ -17,11 +17,12 @@ spec:
       - image: praqma/network-multitool:alpine-extra
         imagePullPolicy: IfNotPresent
         name: multitool
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: app-svc
+  name: dpl-multitool-svc
   namespace: default
 spec:
   ports:

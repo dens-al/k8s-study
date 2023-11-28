@@ -3,7 +3,7 @@ kind: Pod
 metadata:
   labels:
     app: nginx
-  name: pod-nginx2-default
+  name: pod-nginx2
 spec:
   containers:
     - name: nginx
@@ -13,7 +13,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: svc-nginx2-default
+  name: svc-nginx2
 spec:
   ports:
     - name: web

@@ -3,7 +3,7 @@ kind: Pod
 metadata:
   labels:
     app: multitool
-  name: pod-multitool2-default
+  name: pod-multitool2
 spec:
   containers:
     - name: network-multitool
@@ -18,7 +18,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: svc-multitool2-default
+  name: svc-multitool2
 spec:
   ports:
     - name: multitool-http

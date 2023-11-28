@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: liveness-pod-cmd
+  name: pod-liveness
   namespace: lesson2
 spec:
   containers:

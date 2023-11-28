@@ -4,7 +4,7 @@ metadata:
   name: dpl-nginx
   namespace: lesson2
 spec:
-  replicas: 4
+  replicas: 3
   selector:
     matchLabels:
       app: web
