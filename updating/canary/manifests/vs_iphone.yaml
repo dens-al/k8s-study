@@ -1,0 +1,94 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: blue-green-canary
+  namespace: demo
+spec:
+  hosts:
+    - "*"
+  gateways:
+    - bgc-gateway
+  http:
+    - match:
+        - headers:
+            user-agent:
+              regex: .*iPhone.*
+          uri:
+            prefix: /bgc
+      rewrite:
+        uri: /
+      route:
+        - destination:
+            host: blue-green-canary
+            port:
+              number: 8080
+            subset: version-blue
+          weight: 100
+    - match:
+        - headers:
+            user-agent:
+              regex: .*iPhone.*
+          uri:
+            prefix: /api
+      rewrite:
+        uri: /api
+      route:
+        - destination:
+            host: blue-green-canary
+            port:
+              number: 8080
+            subset: version-blue
+          weight: 100
+    - match:
+        - headers:
+            user-agent:
+              regex: .*Android.*
+          uri:
+            prefix: /bgc
+      rewrite:
+        uri: /
+      route:
+        - destination:
+            host: blue-green-canary
+            port:
+              number: 8080
+            subset: version-yellow
+          weight: 100
+
+    - match:
+        - headers:
+            user-agent:
+              regex: .*Android.*
+          uri:
+            prefix: /api
+      rewrite:
+        uri: /api
+      route:
+        - destination:
+            host: blue-green-canary
+            port:
+              number: 8080
+            subset: version-yellow
+          weight: 100
+    - match:
+        - uri:
+            prefix: /bgc
+      rewrite:
+        uri: /
+      route:
+        - destination:
+            host: blue-green-canary
+            port:
+              number: 8080
+            subset: version-green
+    - match:
+        - uri:
+            prefix: /api
+      rewrite:
+        uri: /api
+      route:
+        - destination:
+            host: blue-green-canary
+            port:
+              number: 8080
+            subset: version-green

@@ -1,0 +1,17 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: blue-green-canary
+  namespace: canary
+spec:
+  host: blue-green-canary
+  subsets:
+  - name: version-blue
+    labels:
+      version: blue
+  - name: version-green
+    labels:
+      version: green
+  - name: version-canary
+    labels:
+      version: canary

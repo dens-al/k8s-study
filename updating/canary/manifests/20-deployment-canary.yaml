@@ -1,0 +1,179 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: blue-green-canary
+  name: blue
+  namespace: canary
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: blue-green-canary
+  template:
+    metadata:
+      labels:
+        app: blue-green-canary
+        group: bgc
+        version: blue
+      annotations:
+        sidecar.istio.io/inject: "true"
+    spec:
+      containers:
+        - image: quay.io/rhdevelopers/blue-green-canary
+          # color blue
+          name: blue
+          env:
+            - name: BLUE_GREEN_CANARY_COLOR
+              value: "#6bbded"
+            - name: BLUE_GREEN_CANARY_MESSAGE
+              value: "Hello"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "150Mi"
+              cpu: "100m"
+            limits:
+              memory: "200Mi"
+              cpu: "250m"
+          livenessProbe:
+            httpGet:
+              port: 8080
+              path: /health/live
+            initialDelaySeconds: 2
+            periodSeconds: 5
+            timeoutSeconds: 2
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: /health/ready
+            initialDelaySeconds: 3
+            periodSeconds: 3
+            timeoutSeconds: 2
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: blue-green-canary
+  name: green
+  namespace: canary
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: blue-green-canary
+  template:
+    metadata:
+      labels:
+        app: blue-green-canary
+        group: bgc
+        version: green
+      annotations:
+        sidecar.istio.io/inject: "true"
+    spec:
+      containers:
+        - image: quay.io/rhdevelopers/blue-green-canary
+          # color green
+          name: green
+          env:
+            - name: BLUE_GREEN_CANARY_COLOR
+              value: "#5bbf45"
+            - name: BLUE_GREEN_CANARY_MESSAGE
+              value: "Hola"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "150Mi"
+              cpu: "100m"
+            limits:
+              memory: "200Mi"
+              cpu: "250m"
+          livenessProbe:
+            httpGet:
+              port: 8080
+              path: /health/live
+            initialDelaySeconds: 2
+            periodSeconds: 5
+            timeoutSeconds: 2
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: /health/ready
+            initialDelaySeconds: 3
+            periodSeconds: 3
+            timeoutSeconds: 2
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: blue-green-canary
+  name: yellow
+  namespace: canary
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: blue-green-canary
+  template:
+    metadata:
+      labels:
+        app: blue-green-canary
+        group: bgc
+        version: yellow
+      annotations:
+        sidecar.istio.io/inject: "true"
+    spec:
+      containers:
+        - image: quay.io/rhdevelopers/blue-green-canary
+          # color yellow
+          name: yellow
+          env:
+            - name: BLUE_GREEN_CANARY_COLOR
+              value: "#f2f25e"
+            - name: BLUE_GREEN_CANARY_MESSAGE
+              value: "Bonjour"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              memory: "150Mi"
+              cpu: "100m"
+            limits:
+              memory: "200Mi"
+              cpu: "250m"
+          livenessProbe:
+            httpGet:
+              port: 8080
+              path: /health/live
+            initialDelaySeconds: 2
+            periodSeconds: 5
+            timeoutSeconds: 2
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: /health/ready
+            initialDelaySeconds: 3
+            periodSeconds: 3
+            timeoutSeconds: 2
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: blue-green-canary
+  namespace: canary
+  labels:
+    app: blue-green-canary
+spec:
+  ports:
+    - port: 8080
+      name: http
+  selector:
+    app: blue-green-canary

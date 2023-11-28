@@ -13,11 +13,11 @@ spec:
             configMapKeyRef:
               name: my-configmap
               key: key1
-#        - name: CONFIGVAR2
-#          valueFrom:
-#            configMapKeyRef:
-#              name: my-configmap
-#              key: key2
+        - name: CONFIGVAR2
+          valueFrom:
+            configMapKeyRef:
+              name: my-configmap
+              key: key2
         - name: SECRETVAR
           valueFrom:
             secretKeyRef:

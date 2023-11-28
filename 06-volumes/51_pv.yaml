@@ -7,7 +7,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   capacity:
-    storage: 10Mi
+    storage: 1Mi
   hostPath:
     path: /data/pv
   persistentVolumeReclaimPolicy: Delete

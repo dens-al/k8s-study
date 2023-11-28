@@ -1,3 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-svc
+  namespace: lesson4
+spec:
+  ports:
+    - name: web
+      port: 80
+  selector:
+    app: myapp
+#  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: multitool
+  namespace: lesson4
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: app
+        image: praqma/network-multitool:alpine-extra
+        imagePullPolicy: IfNotPresent
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -7,7 +41,7 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
-    - host: ingress.almuhametov.com
+    - host: dens-al.ru
       http:
         paths:
           - path: /
@@ -25,7 +59,30 @@ spec:
                 port:
                   name: app
 
-  tls:
-    - hosts:
-        - ingress.almuhametov.com
-      secretName: tls-secret
+
+#  tls:
+#    - hosts:
+#        - ingress.almuhametov.ru
+#      secretName: tls-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingress
+  namespace: ingress
+spec:
+  selector:
+    name: nginx-ingress-microk8s
+  type: LoadBalancer
+  # loadBalancerIP is optional. MetalLB will automatically allocate an IP
+  # from its pool if not specified. You can also specify one manually.
+  # loadBalancerIP: x.y.z.a
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+    - name: https
+      protocol: TCP
+      port: 443
+      targetPort: 443

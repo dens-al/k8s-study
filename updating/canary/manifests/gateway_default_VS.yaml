@@ -1,0 +1,33 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: bgc-gateway
+  namespace: canary
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: blue-green-canary
+  namespace: canary
+spec:
+  host: blue-green-canary
+  subsets:
+  - name: version-blue
+    labels:
+      version: blue
+  - name: version-green
+    labels:
+      version: green
+  - name: version-yellow
+    labels:
+      version: yellow
