@@ -10,6 +10,9 @@ kubectl label pods pod-nginx rock-
 
 kubectl apply -f 01-pods/02_pod_svc_nginx.yaml
 kubectl run curl svc-nginx2 --image=curlimages/curl -i --tty --rm -- sh
+kubectl get svc -o wide 
+kubectl get ep
+kubectl describe svc svc-nginx2
 
 kubectl apply -f 01-pods/03_pod_multitool.yaml 
 kubectl exec -it pod-multitool -- bash
@@ -34,3 +37,5 @@ kubectl get pods -n lesson2 -o wide
 
 ### Lesson 3. Services
 kubectl create ns lesson3
+
+kubectl describe 
