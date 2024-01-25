@@ -12,7 +12,7 @@ spec:
     - match:
         - headers:
             user-agent:
-              regex: .*Chrome.*
+              regex: .*Android.*
           uri:
             prefix: /
       rewrite:
@@ -23,6 +23,21 @@ spec:
             port:
               number: 8080
             subset: version-yellow
+          weight: 100
+    - match:
+        - headers:
+            user-agent:
+              regex: .*iPhone.*
+          uri:
+            prefix: /
+      rewrite:
+        uri: /
+      route:
+        - destination:
+            host: blue-green-canary
+            port:
+              number: 8080
+            subset: version-blue
           weight: 100
     - match:
         - uri:

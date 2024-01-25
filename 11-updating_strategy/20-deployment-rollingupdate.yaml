@@ -21,7 +21,7 @@ spec:
         app: main
     spec:
       containers:
-        - image: nginx:1.22
+        - image: nginx:1.21
           ports:
             - containerPort: 80
               name: web

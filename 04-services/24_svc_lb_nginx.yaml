@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: web-svc-lb
-  namespace: lesson3
+#  namespace: lesson3
 spec:
   ports:
     - name: web
@@ -15,7 +15,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: multitool
-  namespace: lesson3
+#  namespace: lesson3
 spec:
   replicas: 2
   selector:

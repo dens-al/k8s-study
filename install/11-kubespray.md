@@ -7,9 +7,9 @@
 sudo apt install software-properties-common -y
 sudo add-apt-repository ppa:deadsnakes/ppa -y
 sudo apt update
-sudo apt install python3.9
+sudo apt install python3.9 -y
 sudo ln -sf /usr/bin/python3.9 /usr/bin/python3
-sudo apt install python3-pip
+sudo apt install python3-pip -y
 ```
 
 ### Склонируйте себе репозиторий:
