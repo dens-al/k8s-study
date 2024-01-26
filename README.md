@@ -1,11 +1,30 @@
 <details>
   <summary>Lesson 1. Basic in k8s</summary>
-  
-- Labels
+
+- Pods
 
 ```shell
 kubectl apply -f 01-pods/01_pod_nginx.yaml
 ```
+
+```shell
+kubectl get pods
+```
+
+```shell
+kubectl get pods -o wide
+```
+
+```shell
+kubectl delete -f 01-pods/01_pod_nginx.yaml
+kubectl apply -f 01-pods/01_pod_nginx.yaml
+sleep 5
+kubectl get pods -o wide
+```
+```shell
+kubectl run my-curl-pod --image=curlimages/curl -it --rm -- sh 
+```
+- Labels
 
 ```shell
 kubectl get pods --show-labels
@@ -54,7 +73,8 @@ kubectl get pods --show-labels
 ```
 
 ```shell
-kubectl run curl svc-nginx2 --image=curlimages/curl -i --tty --rm -- sh
+kubectl run my-curl-pod --image=curlimages/curl -it --rm -- sh 
+curl svc-nginx2
 ```
 
 ```shell
@@ -74,31 +94,74 @@ kubectl apply -f 01-pods/03_pod_multitool.yaml
 ```
 
 ```shell
-kubectl exec -it pod-multitool -- bash
+kubectl exec pod-multitool -it -- bash
+```
+
+```shell
+kubectl port-forward
 ```
 
 </details>
 
 <details>
   <summary>Lesson 2. Init containers, deployments, daemonsets</summary>
-  
-  kubectl create ns lesson2
-  kubectl -n lesson2 get pod -w
+
+```shell
+kubectl create ns lesson2
+```
+
+```shell
+kubectl -n lesson2 get pod -w
+```
+
+```shell
   kubectl -n lesson2 logs pod-init -f
-  kubectl -n lesson2 logs pod-init -c delay
-  kubectl -n lesson2 describe pod init-pod
-  kubectl apply -f 01-pods/11_pod_init.yaml
-  kubectl apply -f 01-pods/12_pod_startup.yaml
-  kubectl apply -f 01-pods/13_pod_liveness.yaml
-  kubectl apply -f 01-pods/14_pod_readyness.yaml
-  
-  kubectl apply -f 02-deployments/11_dpl_svc_nginx.yaml
-  kubectl -n lesson2 get replicaset
-  kubectl -n lesson2 delete pod dpl-nginx-65848665bd-97v6r
-  
-  kubectl apply -f 03-daemonsets/11_dms.yaml
-  kubectl get pods -n lesson2 -o wide
-  
+  ```
+
+```shell
+kubectl -n lesson2 logs pod-init -c delay
+```
+
+```shell
+kubectl -n lesson2 describe pod init-pod
+```
+
+```shell
+kubectl apply -f 01-pods/11_pod_init.yaml
+```
+
+```shell
+kubectl apply -f 01-pods/12_pod_startup.yaml
+```
+
+```shell
+kubectl apply -f 01-pods/13_pod_liveness.yaml
+```
+
+```shell
+kubectl apply -f 01-pods/14_pod_readyness.yaml
+```
+
+```shell
+kubectl apply -f 02-deployments/11_dpl_svc_nginx.yaml
+```
+
+```shell
+kubectl -n lesson2 get replicaset
+```
+
+```shell
+kubectl -n lesson2 delete pod dpl-nginx-65848665bd-97v6r
+```
+
+```shell
+kubectl apply -f 03-daemonsets/11_dms.yaml
+```
+
+```shell
+kubectl get pods -n lesson2 -o wide
+```
+
 </details>
 
 ### Lesson 3. Services
