@@ -1,0 +1,97 @@
+---
+### First app ###
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: multitool-pragma
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: app1
+  template:
+    metadata:
+      labels:
+        app: app1
+    spec:
+      containers:
+        - name: multitool-pragma
+          image: praqma/network-multitool:alpine-extra
+          imagePullPolicy: IfNotPresent
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app1-svc
+spec:
+  ports:
+    - name: web
+      port: 80
+  selector:
+    app: app1
+---
+## Second app ###
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: multitool-wbitt
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: app2
+  template:
+    metadata:
+      labels:
+        app: app2
+    spec:
+      containers:
+        - name: multitool-wbitt
+          image: wbitt/network-multitool
+          imagePullPolicy: IfNotPresent
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app2-svc
+spec:
+  ports:
+    - name: web
+      port: 80
+  selector:
+    app: app2
+---
+## ========= Yandex ALN ingress controller's ingress ========== #
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: alb-yc-tls
+  annotations:
+## NEED to be created at least 1 subnet in EVERY zone!
+    ingress.alb.yc.io/subnets: e9bbh4korig7urgn1l6a, e2l6ghdri3t32fcq0nbi, b0ca121ph87p00nplm10, fl8e7lvdaspcij9gmf7s
+    ingress.alb.yc.io/group-name: my-ingress-group
+    ingress.alb.yc.io/security-groups: enp9sq70mloc2l7dfstm
+    ingress.alb.yc.io/external-ipv4-address: auto
+spec:
+  tls:
+    - hosts:
+        - dens-al.ru
+      secretName: yc-certmgr-cert-id-fpq4jmuu373m5pkto5ue
+  rules:
+    - host: dens-al.ru
+      http:
+        paths:
+          - path: /app1
+            pathType: Prefix
+            backend:
+              service:
+                name: app1-svc
+                port:
+                  number: 80
+          - path: /app2
+            pathType: Prefix
+            backend:
+              service:
+                name: app1-svc
+                port:
+                  name: web

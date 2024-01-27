@@ -1,68 +1,79 @@
 <details>
   <summary>Lesson 1. Basic in k8s</summary>
 
-- Pods
+### Pods
 
 ```shell
 kubectl apply -f 01-pods/01_pod_nginx.yaml
 ```
-
+- посмотреть все поды
 ```shell
 kubectl get pods
 ```
-
+- посмотреть подробнее про все поды в том числе IP-адреса
 ```shell
 kubectl get pods -o wide
 ```
-
+- IP адреса меняются после перезапуска пода
 ```shell
 kubectl delete -f 01-pods/01_pod_nginx.yaml
 kubectl apply -f 01-pods/01_pod_nginx.yaml
 sleep 5
 kubectl get pods -o wide
 ```
+- запуск пода императивно
 ```shell
 kubectl run my-curl-pod --image=curlimages/curl -it --rm -- sh 
 ```
-- Labels
 
+### Labels
+- просмотр подов с метками
 ```shell
 kubectl get pods --show-labels
 ```
-
+- добавление метки
 ```shell
 kubectl label pods pod-nginx rock=metallica
-```
-
-```shell
 kubectl get pods --show-labels
 ```
-
+- не все знаки можно использовать в метках
 ```shell
 kubectl label pods pod-nginx rock=ac/dc
-```
-
-```shell
 kubectl label pods pod-nginx rock=pink floyd
 ```
-
+- ключ должен быть уникальный
 ```shell
 kubectl label pods pod-nginx rock=slayer
-```
-
-```shell
 kubectl label pods pod-nginx alternative=korn
 ```
 
 ```shell
 kubectl get pods --show-labels
+kubectl get pods -L alternative,rock
 ```
-
+- фильтрация по метке
 ```shell
 kubectl get pods -l alternative=korn
+kubectl get pods -l alternative!=korn
+```
+- фильтрация по набору
+```shell
+kubectl get pods -l alternative,rock
+```
+- можно метить ноды и использовать в NodeSelecor
+```shell
+kubectl get pods 
+kubectl label nodes microk8s-01 gpu=true
+kubectl get pods 
 ```
 
-- services and endpoints
+- добавление аннотации
+```shell
+kubectl annotate pod pod-nginx created-by="denis"
+kubectl describe pod pod-nginx
+kubectl describe pod pod-nginx-node-selector
+```
+### Services and endpoints
 
 ```shell
 kubectl apply -f 01-pods/02_pod_svc_nginx.yaml
