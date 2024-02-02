@@ -11,8 +11,8 @@ spec:
       httpGet:
         path: /
         port: 80
-      initialDelaySeconds: 5  # wait 3 sec before run probe
-      periodSeconds: 3        # period exec 3 sec
+      initialDelaySeconds: 5  # wait 5 sec before run probe
+      periodSeconds: 3        # period between probes 3 sec
       timeoutSeconds: 1       # wait 1 sec after exec
       failureThreshold: 4     # 4 attempts
-      successThreshold: 1     # after 2 success answer
+      successThreshold: 1     # after 2 success attempts answer

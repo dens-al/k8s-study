@@ -10,4 +10,4 @@ spec:
   initContainers:
     - name: init-delay
       image: busybox
-      command: [ 'sleep', '30' ]
+      command: [ 'sleep', '15' ]

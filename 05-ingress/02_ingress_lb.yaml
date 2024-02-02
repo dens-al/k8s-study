@@ -45,6 +45,8 @@ spec:
       labels:
         app: multitool
     spec:
+      nodeSelector:
+        gpu: "true"
       containers:
       - name: network-multitool
         image: praqma/network-multitool:alpine-extra
@@ -63,8 +65,8 @@ metadata:
 spec:
   ports:
     - name: app
-      port: 31080
-#      targetPort: 31080
+      port: 80
+      targetPort: 31080
   selector:
     app: multitool
 #  type: ClusterIP
@@ -97,3 +99,31 @@ spec:
                 name: multitool-svc
                 port:
                   name: app
+
+
+#  tls:
+#    - hosts:
+#        - ingress.almuhametov.ru
+#      secretName: tls-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingress
+  namespace: ingress
+spec:
+  selector:
+    name: nginx-ingress-microk8s
+  type: LoadBalancer
+  # loadBalancerIP is optional. MetalLB will automatically allocate an IP
+  # from its pool if not specified. You can also specify one manually.
+  # loadBalancerIP: x.y.z.a
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+    - name: https
+      protocol: TCP
+      port: 443
+      targetPort: 443

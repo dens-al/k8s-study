@@ -4,7 +4,7 @@ metadata:
   name: dpl-nginx
   namespace: lesson2
 spec:
-  replicas: 3
+  replicas: 4
   selector:
     matchLabels:
       app: web
@@ -14,7 +14,7 @@ spec:
         app: web
     spec:
       containers:
-        - image: nginx:1.19.2
+        - image: nginx:1.20
           name: nginx
 ---
 apiVersion: v1

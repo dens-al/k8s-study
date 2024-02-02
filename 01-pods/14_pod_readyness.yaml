@@ -3,10 +3,19 @@ kind: Pod
 metadata:
   name: pod-readiness
   namespace: lesson2
+  labels:
+    app: nginx-readiness
 spec:
   containers:
-  - name: nginx
-    image: nginx:1.19
+  - name: multitool
+#    image: nginx:1.19
+    image: wbitt/network-multitool
+    env:
+      - name: HTTP_PORT
+        value: "31080"
+    ports:
+      - containerPort: 31080
+        name: somename
     readinessProbe:
       httpGet:
         path: /
@@ -16,3 +25,15 @@ spec:
       timeoutSeconds: 1       # wait 1 sec after exec
       failureThreshold: 1     # 4
       successThreshold: 2     # after 2 success answer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-readiness
+  namespace: lesson2
+spec:
+  ports:
+    - port: 80
+      targetPort: 31080
+  selector:
+    app: nginx-readiness

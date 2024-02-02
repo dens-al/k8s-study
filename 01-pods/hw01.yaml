@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hello-world
+  labels:
+    app: web
+spec:
+  containers:
+  - name: hello
+    image: gcr.io/kubernetes-e2e-test-images/echoserver:2.2

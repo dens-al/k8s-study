@@ -46,14 +46,14 @@ spec:
         app: multitool
     spec:
       containers:
-      - name: network-multitool
-        image: praqma/network-multitool:alpine-extra
-        env:
-          - name: HTTP_PORT
-            value: "31080"
-        ports:
-          - containerPort: 31080
-            name: somename
+        - name: network-multitool
+          image: praqma/network-multitool:alpine-extra
+          env:
+            - name: HTTP_PORT
+              value: "31080"
+          ports:
+            - containerPort: 31080
+              name: somename
 
 ---
 apiVersion: v1
@@ -64,7 +64,7 @@ spec:
   ports:
     - name: app
       port: 31080
-#      targetPort: 31080
+  #      targetPort: 31080
   selector:
     app: multitool
 #  type: ClusterIP
@@ -78,9 +78,12 @@ metadata:
   name: ingress-apps
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
+    # add an annotation indicating the issuer to use.
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+#    cert-manager.io/cluster-issuer: letsencrypt-staging
 spec:
   rules:
-    - host: app.dens-al.ru
+    - host: web.dens-al.ru
       http:
         paths:
           - path: /
@@ -90,10 +93,18 @@ spec:
                 name: nginx-svc
                 port:
                   name: web
-          - path: /app
-            pathType: Exact
+    - host: app.dens-al.ru
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
             backend:
               service:
                 name: multitool-svc
                 port:
                   name: app
+  tls: # < placing a host in the TLS config will determine what ends up in the cert's subjectAltNames
+    - hosts:
+        - web.dens-al.ru
+        - app.dens-al.ru
+      secretName: my-ingress-cert # < cert-manager will store the created certificate in this secret.
