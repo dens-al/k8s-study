@@ -1,31 +1,31 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: svc-multitool-clusterip
+  name: svc-multitool-lb
   namespace: lesson3
 spec:
   ports:
-    - name: http-multitool
+    - name: web
       port: 80
-      targetPort: app-port
+      targetPort: 31080
   selector:
-    app: myapp
-#  type: ClusterIP
+    app: lbapp
+  type: LoadBalancer
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dpl-multitool
+  name: dpl-multitool-lb
   namespace: lesson3
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: myapp
+      app: lbapp
   template:
     metadata:
       labels:
-        app: myapp
+        app: lbapp
     spec:
       containers:
         - name: multitool
@@ -33,6 +33,3 @@ spec:
           env:
             - name: HTTP_PORT
               value: "31080"
-          ports:
-            - containerPort: 31080
-              name: app-port

@@ -8,7 +8,6 @@ metadata:
 spec:
   containers:
   - name: multitool
-#    image: nginx:1.19
     image: wbitt/network-multitool
     env:
       - name: HTTP_PORT

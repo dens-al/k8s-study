@@ -150,23 +150,31 @@ kubectl port-forward
 ### Init Containers
 
 - создадим namespace, в котором будем устанавливать ресурсы
+
 ```shell
 kubectl create ns lesson2
 ```
+
 - запустим просмотр состояния подов в интерактивном режиме (watch)
+
 ```shell
 kubectl -n lesson2 get pod -w
 ```
+
 - перейдем на другую консоль и запустим инит контейнера
+
 ```shell
 kubectl apply -f 01-pods/11_pod_init.yaml
 ```
+
 - после запуска можно посмотреть логи и увидеть как запускался инит контейнер
+
 ```shell
 kubectl -n lesson2 describe pod pod-init
 ```
 
 ### Probes
+
 ```shell
 kubectl apply -f 01-pods/12_pod_startup.yaml
 ```
@@ -177,33 +185,136 @@ kubectl apply -f 01-pods/13_pod_liveness.yaml
 
 ```shell
 kubectl apply -f 01-pods/14_pod_readyness.yaml
-- почему не запустился под? Потому что readinessProbe проверяет другой порт. Endpoints не появился, хотя сервис есть.
 ```
 
+- почему не запустился под? Потому что readinessProbe проверяет другой порт. Endpoints не появился, хотя сервис есть.
+
 ### Deployments
+
 ```shell
 kubectl apply -f 02-deployments/11_dpl_svc_nginx.yaml
 kubectl get pods -n lesson2
 ```
+
 - названия подов состоят из имени деплоймента, имени репликисет и собственного хвоста
+
 ```shell
 kubectl -n lesson2 get replicaset
 ```
+
 - попробуем удалить один произвольный под из деплоймента и увидем, что деплоймент запустит НОВЫЙ под с другим именем.
+
 ```shell
 kubectl -n lesson2 delete pod dpl-nginx-65848665bd-97v6r
 kubectl get pods -n lesson2 -w
 ```
--  демонсет
+
+- демонсет
+
 ```shell
 kubectl apply -f 03-daemonsets/11_dms.yaml
 ```
+
 </details>
 
-### Lesson 3. Services
 
+<details>
+  <summary>Lesson 3. Services</summary>
+
+### Cluster IP
+
+- создадим namespace, в котором будем устанавливать ресурсы
+
+```shell
 kubectl create ns lesson3
+```
 
-kubectl describe
+- установим деплоймент с мултитулом и сервис. Портам можно давать имена в конфигурации, чтобы в дальнейшем обращаться по
+  имени
 
+```shell
+kubectl apply -f 04-services/21_svc_clusterip_multitool.yaml
+kubectl describe svc -n lesson3 svc-multitool-clusterip
+```
+
+создадим pod с curl и изучим адреса и доменные имена сервиса
+
+```shell
+kubectl run -n lesson3 my-curl-pod --image=curlimages/curl -it --rm -- sh 
+curl svc-multitool-clusterip
+curl svc-multitool-clusterip.lesson3.svc.cluster.local
+nslookup svc-multitool-clusterip.lesson3.svc.cluster.local
+```
+
+- убедимся, что можно из **другого** неймспейса достучаться по днс-имени
+
+```shell
+kubectl run my-curl-pod --image=curlimages/curl -it --rm -- sh 
+curl svc-multitool-clusterip
+curl svc-multitool-clusterip.lesson3.svc.cluster.local
+nslookup svc-multitool-clusterip.lesson3.svc.cluster.local
+```
+
+- рассмотрим сервис с несколькими портами и pod с несколькими контейнерами
+
+```shell
+kubectl apply -f 04-services/22_svc_multi_dpl_multitool.yaml
+kubectl describe svc -n lesson3 svc-multitool-clusterip-multiport
+kubectl get ep -n lesson3
+```
+
+- убедимся, что можно из достучаться через разные порты одного сервиса на разные контейнеры
+
+```shell
+kubectl run -n lesson3 my-curl-pod --image=curlimages/curl -it --rm -- sh 
+curl svc-multitool-clusterip-multiport:1601
+curl svc-multitool-clusterip-multiport:1602
+curl -k https://svc-multitool-clusterip-multiport:1603
+```
+
+### NodePort
+
+- применим манифест с сервисом типа NodePort
+
+```shell
+kubectl apply -f 04-services/23_svc_nodeport_multitool.yaml
+kubectl get svc -n lesson3 -o wide
+kubectl get ep -n lesson3
+kubectl get nodes -o wide
+```
+
+- убедимся, что можно подключиться к **любой** ноде по порту 30080, даже если pod запущен на другой ноде
+
+```shell
+curl 158.160.117.28:30080
+```
+
+- при этом сервис по прежнему доступен внутри кластера
+
+```shell
+kubectl run -n lesson3 my-curl-pod --image=curlimages/curl -it --rm -- sh 
+curl svc-multitool-nodeport
+```
+
+### LoadBalancer
+
+- применяется в облаках, где есть балансировщик. (в microk8s можно поставить metallb)
+
+```shell
+kubectl apply -f 04-services/24_svc_lb_multitool.yaml 
+kubectl get svc -n lesson3 -o wide
+kubectl get ep -n lesson3
+```
+
+- создается сетевой балансировщик автоматически в клауде и можно постучаться на публичный адрес
+- при этом под капотом создается сервис типа NodePort
+
+```shell
+kubectl describe svc -n lesson3 svc-multitool-lb | grep NodePort
+```
+
+</details>
+
+
+### Ingress
 curl -H "Host: app.dens-al.ru" http://158.160.102.82/app

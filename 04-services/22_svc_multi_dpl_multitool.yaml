@@ -1,25 +1,27 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: app-svc-multi
+  name: svc-multitool-clusterip-multiport
   namespace: lesson3
 spec:
   ports:
     - name: web
       port: 1601
       targetPort: 80
-    - name: multitool
+    - name: multitool-http
       port: 1602
-      targetPort: 8080
+      targetPort: 31080
+    - name: multitool-https
+      port: 1603
+      targetPort: 31443
   selector:
     app: multiapp
 #  type: ClusterIP
-
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: multi-app
+  name: dpl-app-multiport
   namespace: lesson3
 spec:
   replicas: 1
@@ -32,12 +34,12 @@ spec:
         app: multiapp
     spec:
       containers:
-      - name: app
-        image: praqma/network-multitool:alpine-extra
-        env:
-          - name: HTTP_PORT
-            value: "8080"
-          - name: HTTPS_PORT
-            value: "8443"
-      - name: nginx
-        image: nginx:1.20-alpine
+        - name: multitool
+          image: wbitt/network-multitool
+          env:
+            - name: HTTP_PORT
+              value: "31080"
+            - name: HTTPS_PORT
+              value: "31443"
+        - name: nginx
+          image: nginx:1.20-alpine
