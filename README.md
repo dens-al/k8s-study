@@ -314,7 +314,13 @@ kubectl describe svc -n lesson3 svc-multitool-lb | grep NodePort
 ```
 
 ## Headless и ExternalName
-
+```shell
+kubectl apply -f 04-services/25_svc_headless_external.yaml
+kubectl get svc -n lesson3 -o wide
+kubectl run -n lesson3 my-curl-pod --image=curlimages/curl -it --rm -- sh 
+nslookup svc-external.lesson3.svc.cluster.local
+nslookup svc-headless.lesson3.svc.cluster.local
+```
 
 </details>
 
