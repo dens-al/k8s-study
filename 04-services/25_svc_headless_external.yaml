@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-external
+  namespace: lesson3
+spec:
+  type: ExternalName
+  externalName: example.com
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-headless
+  namespace: lesson3
+spec:
+  clusterIP: None
+  selector:
+    app: myapp
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: app-port
+  type: ClusterIP

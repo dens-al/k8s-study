@@ -313,6 +313,9 @@ kubectl get ep -n lesson3
 kubectl describe svc -n lesson3 svc-multitool-lb | grep NodePort
 ```
 
+## Headless и ExternalName
+
+
 </details>
 
 
