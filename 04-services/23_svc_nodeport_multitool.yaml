@@ -8,7 +8,7 @@ spec:
   ports:
     - name: http-multitool
       port: 80
-      nodePort: 30080 # port-range: 30000-32767
+#      nodePort: 30080 # port-range: 30000-32767
       targetPort: 31080
   selector:
     app: nodeapp
@@ -21,7 +21,7 @@ metadata:
   name: dpl-multitool-nodeport
   namespace: lesson3
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: nodeapp

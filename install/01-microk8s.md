@@ -6,4 +6,4 @@
 # Add
 # IP.4 = 123.45.67.89
 ```
-- обновить сертификаты `sudo microk8s refresh-certs --cert front-proxy-client.crt`.
+- обновить сертификаты `sudo microk8s refresh-certs --cert front-proxy-client.crt`

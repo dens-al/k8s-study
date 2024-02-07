@@ -314,6 +314,7 @@ kubectl describe svc -n lesson3 svc-multitool-lb | grep NodePort
 ```
 
 ## Headless и ExternalName
+
 ```shell
 kubectl apply -f 04-services/25_svc_headless_external.yaml
 kubectl get svc -n lesson3 -o wide
@@ -324,6 +325,72 @@ nslookup svc-headless.lesson3.svc.cluster.local
 
 </details>
 
+<details>
+  <summary>Lesson 4. Ingress</summary>
 
-### Ingress
+### Microk8s
+
+`microk8s enable ingress` - команда включит ингресс-контроллер nginx, но не будет внешнего адреса, т.к. нет сервиса типа
+LoadBalancer. Это вполне рабочая схема, но только для локального пользования
+
+```shell
+kubectl get all -n ingress
+```
+
+- установим приложения
+
+```shell
+kubectl apply -f 05-ingress/apps/nginx-simple.yaml
+kubectl apply -f 05-ingress/apps/multitool.yaml
+```
+
+- установим ingress
+
+```shell
+kubectl apply -f 05-ingress/01_ingress.yaml
+```
+
+- DNS имя настроено было заранее, поэтому адрес `microk8s.dens-al.ru` резолвится на одну из нод microk8s
+
+```shell
+curl http://microk8s.dens-al.ru/
+curl http://microk8s.dens-al.ru/app
+```
+
+- DNS имя `example.dens-al.ru` не было заведено заранее и потому не резолвится.
+
+```shell
+curl http://example.dens-al.ru/
+```
+
+- Можно проверить командой:
+
+```shell
+ curl -H "Host: example.dens-al.ru" http://51.250.89.105
+```
+
+### Yandex Cloud K8S Cluster + Nginx Controller
+- установим через Helm
+```shell
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx && \
+helm repo update && \
+helm install ingress-nginx ingress-nginx/ingress-nginx -n ingress-nginx --create-namespace
+```
+- посмотрим, что установилось
+```shell
+kubectl get all -n ingress-nginx
+```
+- установим приложения
+
+```shell
+kubectl apply -f 05-ingress/apps/nginx-simple.yaml
+kubectl apply -f 05-ingress/apps/multitool.yaml
+```
+
+- установим ingress
+
+```shell
+kubectl apply -f 05-ingress/01_ingress.yaml
+```
+
 curl -H "Host: app.dens-al.ru" http://158.160.102.82/app

@@ -1,0 +1,75 @@
+## multitool application
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dpl-multitool-traefik
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: multitool-traefik
+  template:
+    metadata:
+      labels:
+        app: multitool-traefik
+    spec:
+      containers:
+      - name: network-multitool
+        image: praqma/network-multitool:alpine-extra
+        env:
+          - name: HTTP_PORT
+            value: "33080"
+        ports:
+          - containerPort: 33080
+            name: somename
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-multitool-traefik
+spec:
+  ports:
+    - name: app
+      port: 33080
+  selector:
+    app: multitool-traefik
+
+# ============== Ingress ============ #
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-traefik
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+spec:
+  ingressClassName: "traefik"
+  rules:
+    - host: traefik.dens-al.ru
+      http:
+        paths:
+          - path: /app
+            pathType: Prefix
+            backend:
+              service:
+                name: multitool-svc
+                port:
+                  name: app
+---
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: nginx
+  namespace: default
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`nginx.example.com`)
+      kind: Rule
+      services:
+        - name: nginx-deploy-main
+          port: 80

@@ -1,0 +1,42 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dpl-nginx-simple
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx-simple
+  template:
+    metadata:
+      labels:
+        app: nginx-simple
+    spec:
+      initContainers:
+        - name: init
+          image: alpine
+          command: ['sh', '-c', 'echo I am simple nginx page > /usr/share/nginx/html/index.html']
+          volumeMounts:
+          - name: webdata
+            mountPath: "/usr/share/nginx/html"
+      containers:
+        - image: nginx:1.19.2
+          name: nginx
+          volumeMounts:
+          - name: webdata
+            mountPath: "/usr/share/nginx/html"
+      volumes:
+        - name: webdata
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-nginx-simple
+spec:
+  ports:
+    - name: web
+      port: 80
+  selector:
+    app: nginx-simple

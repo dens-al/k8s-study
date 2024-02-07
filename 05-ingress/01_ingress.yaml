@@ -1,77 +1,4 @@
 ---
-## Web application
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: dpl-nginx
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: web
-  template:
-    metadata:
-      labels:
-        app: web
-    spec:
-      containers:
-        - image: nginx:1.19.2
-          name: nginx
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: nginx-svc
-spec:
-  ports:
-    - name: web
-      port: 80
-  selector:
-    app: web
-
-## multitool application
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: dpl-multitool
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: multitool
-  template:
-    metadata:
-      labels:
-        app: multitool
-    spec:
-      containers:
-      - name: network-multitool
-        image: praqma/network-multitool:alpine-extra
-        env:
-          - name: HTTP_PORT
-            value: "31080"
-        ports:
-          - containerPort: 31080
-            name: somename
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: multitool-svc
-spec:
-  ports:
-    - name: app
-      port: 31080
-#      targetPort: 31080
-  selector:
-    app: multitool
-#  type: ClusterIP
-
-
-# ============== Ingress ============ #
----
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -79,21 +6,42 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
+  ingressClassName: "nginx"
   rules:
-    - host: app.dens-al.ru
+    - host: netology.dens-al.ru
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: nginx-svc
+                name: svc-nginx-simple
                 port:
                   name: web
-          - path: /app
+          - path: /app # http://microk8s.dens-al.ru/app -> http://svc-multitool/
             pathType: Exact
             backend:
               service:
-                name: multitool-svc
+                name: svc-multitool
                 port:
                   name: app
+#    - host: another.dens-al.ru
+#      http:
+#        paths:
+#          - path: /
+#            pathType: Prefix
+#            backend:
+#              service:
+#                name: svc-nginx-blue
+#                port:
+#                  name: web
+#    - host: example.dens-al.ru
+#      http:
+#        paths:
+#          - path: /
+#            pathType: Prefix
+#            backend:
+#              service:
+#                name: svc-nginx-green
+#                port:
+#                  name: web

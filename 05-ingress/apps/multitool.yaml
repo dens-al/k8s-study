@@ -1,0 +1,39 @@
+## multitool application
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dpl-multitool
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: multitool
+  template:
+    metadata:
+      labels:
+        app: multitool
+    spec:
+      containers:
+      - name: network-multitool
+        image: praqma/network-multitool:alpine-extra
+        env:
+          - name: HTTP_PORT
+            value: "31080"
+        ports:
+          - containerPort: 31080
+            name: somename
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-multitool
+spec:
+  ports:
+    - name: app
+      port: 80
+      targetPort: somename
+  selector:
+    app: multitool
+#  type: ClusterIP
+
