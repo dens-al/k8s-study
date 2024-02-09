@@ -13,9 +13,9 @@ spec:
     - name: busybox
       image: busybox
       command: ["sleep", "3600"]
-#      volumeMounts:
-#        - mountPath: "/tmp/cache"
-#          name: my-volume
+      volumeMounts:
+        - mountPath: "/tmp/cache"
+          name: my-volume
   volumes:
     - name: my-volume
       emptyDir: {}

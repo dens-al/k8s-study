@@ -337,7 +337,7 @@ LoadBalancer. Это вполне рабочая схема, но только �
 kubectl get all -n ingress
 ```
 
-- установим приложения
+- создадим namespace и установим приложения
 
 ```shell
 kubectl apply -f 05-ingress/apps/nginx-simple.yaml
@@ -370,16 +370,21 @@ curl http://example.dens-al.ru/
 ```
 
 ### Yandex Cloud K8S Cluster + Nginx Controller
+
 - установим через Helm
+
 ```shell
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx && \
 helm repo update && \
 helm install ingress-nginx ingress-nginx/ingress-nginx -n ingress-nginx --create-namespace
 ```
+
 - посмотрим, что установилось
+
 ```shell
 kubectl get all -n ingress-nginx
 ```
+
 - установим приложения
 
 ```shell
@@ -394,3 +399,94 @@ kubectl apply -f 05-ingress/01_ingress.yaml
 ```
 
 curl -H "Host: app.dens-al.ru" http://158.160.102.82/app
+</details>
+
+<details>
+  <summary>Lesson 5. Volumes</summary>
+
+### EmptyDir
+
+- создадим namespace, в котором будем работать
+
+```shell
+kubectl create ns lesson5
+```
+
+- установим приложения
+
+```shell
+kubectl apply -f 06-volumes/41_pod_vol.yaml
+kubectl get pods -n lesson5 
+sleep 5 
+kubectl get pods -n lesson5 
+```
+
+- зайдем на контейнер busybox пода
+
+```shell
+kubectl exec -n lesson5 pod-emptydir -c busybox -it -- sh
+```
+
+- создадим там файл в папке
+
+```shell
+echo Hello Netology > /tmp/cache/text.txt
+ls -la /tmp/cache
+```
+
+- посмотрим файл в контейнере nginx
+
+```shell
+kubectl exec -n lesson5 pod-emptydir -c nginx -it -- bash
+ls -la /static
+cat /static/text.txt
+```
+
+- где находятся файл text.txt?
+
+```shell
+sudo ls -la /var/lib/kubelet/pods
+```
+
+- видим, что есть много папок с именами UID. Чтобы узнать необходимую нам папку, надо узнать UID нашего пода
+
+```shell
+kubectl get pod -n lesson5 pod-emptydir -o yaml | grep uid
+```
+
+- можно записать что-то прямо из консоли ноды
+- что будет если удалить под?
+
+```shell
+kubectl delete pod -n lesson5 pod-emptydir
+```
+
+### HostPath
+
+```shell
+kubectl apply -f 06-volumes/42_pod_vol.yaml
+```
+
+- зайдем на контейнер busybox пода
+
+```shell
+kubectl exec -n lesson5 pod-hostpath -c busybox -it -- sh
+```
+
+- создадим там файл в папке
+
+```shell
+echo Privet Netology > /data/privet.txt
+ls -la /data
+```
+
+- что будет если удалить под?
+
+```shell
+kubectl delete pod -n lesson5 pod-emptydir
+```
+
+- если запустить под еще раз и он развернется на этой же ноде, то файлы сохранятся
+- что будет, если имя volume не совпадет? 
+- 
+</details>
