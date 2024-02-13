@@ -487,6 +487,52 @@ kubectl delete pod -n lesson5 pod-emptydir
 ```
 
 - если запустить под еще раз и он развернется на этой же ноде, то файлы сохранятся
-- что будет, если имя volume не совпадет? 
-- 
+- что будет, если имя volume не совпадет?
+</details>
+
+<details>
+  <summary>Lesson 6. PV, PVC, SC</summary>
+
+### PersistentVolume
+
+- создадим namespace, в котором будем работать
+
+```shell
+kubectl create ns lesson6
+```
+
+```shell
+kubectl apply -f 06-volumes/50_pod_manual.yaml
+```
+
+- включим hostpath-storage на microk8s `microk8s enable hostpath-storage`. Этот SC будет по умолчанию
+```shell
+kubectl get sc
+```
+
+- проверим на примере, не указывая StorageClass
+```shell
+kubectl apply -f 06-volumes/51_pod-pvc-local.yaml
+```
+
+- включим nfs на microk8s `microk8s enable nfs`. Кроме того, надо установить пакет nfs-common на всех нодах `sudo apt update && sudo apt install -y nfs-common`
+```shell
+kubectl get sc
+```
+
+- создадим pod с PVC из nfs
+```shell
+kubectl apply -f 06-volumes/52_pod-pvc-nfs.yaml
+```
+
+- включим ceph используя microceph по [инструкции](https://www.virtualizationhowto.com/2023/08/kubernetes-persistent-volume-setup-with-microk8s-rook-and-ceph/) 
+```shell
+kubectl get sc
+```
+
+- создадим pod с PVC из Ceph
+```shell
+kubectl apply -f 06-volumes/53_pod-pvc-ceph.yaml
+```
+
 </details>
