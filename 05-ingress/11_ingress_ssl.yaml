@@ -4,6 +4,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: dpl-nginx
+  namespace: lesson7
 spec:
   replicas: 2
   selector:
@@ -17,58 +18,35 @@ spec:
       containers:
         - image: nginx:1.19.2
           name: nginx
+          volumeMounts:
+            - name: config-volume
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: config-volume
+          configMap:
+            name: nginx-configuration
+
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: nginx-svc
+  namespace: lesson7
 spec:
   ports:
     - name: web
       port: 80
   selector:
     app: web
-
-## multitool application
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: dpl-multitool
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: multitool
-  template:
-    metadata:
-      labels:
-        app: multitool
-    spec:
-      containers:
-        - name: network-multitool
-          image: praqma/network-multitool:alpine-extra
-          env:
-            - name: HTTP_PORT
-              value: "31080"
-          ports:
-            - containerPort: 31080
-              name: somename
-
 ---
 apiVersion: v1
-kind: Service
+kind: ConfigMap
 metadata:
-  name: multitool-svc
-spec:
-  ports:
-    - name: app
-      port: 31080
-  #      targetPort: 31080
-  selector:
-    app: multitool
-#  type: ClusterIP
-
+  name: nginx-configuration
+  namespace: lesson7
+data:
+  index.html: |
+    Hello Netology
 
 # ============== Ingress ============ #
 ---
@@ -76,14 +54,15 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: ingress-apps
+  namespace: lesson7
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
-    # add an annotation indicating the issuer to use.
     cert-manager.io/cluster-issuer: letsencrypt-prod
 #    cert-manager.io/cluster-issuer: letsencrypt-staging
 spec:
+  ingressClassName: "nginx"
   rules:
-    - host: web.dens-al.ru
+    - host: microk8s.dens-al.ru
       http:
         paths:
           - path: /
@@ -93,18 +72,18 @@ spec:
                 name: nginx-svc
                 port:
                   name: web
-    - host: app.dens-al.ru
+    - host: test.dens-al.ru
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: multitool-svc
+                name: nginx-svc
                 port:
-                  name: app
+                  name: web
   tls: # < placing a host in the TLS config will determine what ends up in the cert's subjectAltNames
     - hosts:
-        - web.dens-al.ru
-        - app.dens-al.ru
+        - microk8s.dens-al.ru
+        - test.dens-al.ru
       secretName: my-ingress-cert # < cert-manager will store the created certificate in this secret.

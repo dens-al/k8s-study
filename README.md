@@ -488,6 +488,7 @@ kubectl delete pod -n lesson5 pod-emptydir
 
 - если запустить под еще раз и он развернется на этой же ноде, то файлы сохранятся
 - что будет, если имя volume не совпадет?
+
 </details>
 
 <details>
@@ -506,33 +507,240 @@ kubectl apply -f 06-volumes/50_pod_manual.yaml
 ```
 
 - включим hostpath-storage на microk8s `microk8s enable hostpath-storage`. Этот SC будет по умолчанию
+
 ```shell
 kubectl get sc
 ```
 
 - проверим на примере, не указывая StorageClass
+
 ```shell
 kubectl apply -f 06-volumes/51_pod-pvc-local.yaml
 ```
 
-- включим nfs на microk8s `microk8s enable nfs`. Кроме того, надо установить пакет nfs-common на всех нодах `sudo apt update && sudo apt install -y nfs-common`
+- включим nfs на microk8s `microk8s enable nfs`. Кроме того, надо установить пакет nfs-common на всех
+  нодах `sudo apt update && sudo apt install -y nfs-common`
+
 ```shell
 kubectl get sc
 ```
 
 - создадим pod с PVC из nfs
+
 ```shell
 kubectl apply -f 06-volumes/52_pod-pvc-nfs.yaml
 ```
 
-- включим ceph используя microceph по [инструкции](https://www.virtualizationhowto.com/2023/08/kubernetes-persistent-volume-setup-with-microk8s-rook-and-ceph/) 
+- включим ceph используя microceph по [инструкции](https://www.virtualizationhowto.com/2023/08/kubernetes-persistent-volume-setup-with-microk8s-rook-and-ceph/)
+
 ```shell
 kubectl get sc
 ```
 
 - создадим pod с PVC из Ceph
+
 ```shell
 kubectl apply -f 06-volumes/53_pod-pvc-ceph.yaml
 ```
+
+</details>
+
+<details>
+  <summary>Lesson 7. ConfigMap, Secret</summary>
+
+### ConfigMap Secret
+
+- кодирование и докодирование в base64
+
+```shell
+echo netology | base64
+echo bmV0b2xvZ3kK | base64 -d
+```
+
+- создадим очередной namespace
+
+```shell
+kubectl create ns lesson7
+```
+
+- заведем configMap и secret
+
+```shell
+kubectl apply -f 07-configs_secrets/60_configmap_secret.yaml
+```
+
+- применим конфигурацию с configMap и secret в виде volume
+
+```shell
+kubectl apply -f 07-configs_secrets/61_multitool_vol.yaml
+```
+
+- получим новые объекты: configMap и secret
+
+```shell
+kubectl get configmaps -n lesson7
+kubectl describe configmaps -n lesson7 my-configmap
+kubectl get secrets -n lesson7
+kubectl describe secrets -n lesson7 my-secret
+kubectl get secrets -n lesson7 my-secret -o yaml
+```
+
+- появились файлы с именами ключей
+
+```shell
+kubectl exec -n lesson7 multitool-vol -it -- tree /etc/config/config
+kubectl exec -n lesson7 multitool-vol -it -- tree /etc/config/secret
+```
+
+- применим конфигурацию с теми же configMap в виде env
+
+```shell
+kubectl apply -f 07-configs_secrets/62_multitool_env.yaml
+```
+
+- получены переменные среды
+
+```shell
+kubectl exec -n lesson7 multitool-env -it -- env
+```
+
+- применим конфигурацию с теми же configMap в виде env_from
+
+```shell
+kubectl apply -f 07-configs_secrets/63_multitool_env_all.yaml
+```
+
+- видим все значения переменных окружения
+
+```shell
+kubectl exec -n lesson7 multitool-env-all -it -- env
+```
+
+- поменяем в значения в configMap и применяем и посмотрим, что произойдет
+
+### Nginx config and htpasswd
+
+- файл конфигурации в виде configMap и пароль от htpasswd в виде secret
+```shell
+kubectl apply -f 07-configs_secrets/64_nginx.yaml
+```
+
+- можно создавать секреты в консоли
+```shell
+kubectl create secret
+```
+```shell
+kubectl create configmap -h
+```
+
+</details>
+
+<details>
+  <summary>Lesson 8. RBAC</summary>
+
+- создадим очередной namespace
+
+```shell
+kubectl create ns lesson8
+```
+
+### Service Account
+
+- при создании namespace создается SA по умолчанию, при этом к подам k8s по умолчанию будет подключать данный SA
+
+```shell
+kubectl get sa -n lesson8
+```
+- создадим собственный SA, убедимся, что у него ничего нет и создадим и токен
+```shell
+kubectl create sa netology-sa -n lesson8
+kubectl describe sa -n lesson8 netology-sa
+```
+- сгенерируем временный токен для нашего SA
+```shell
+kubectl create token netology-sa -n lesson8
+```
+- этот токен можно использовать для подключения к кластеру. Также нам потребуется ca.crt, который можно скачать с кластера (в microk8s сертификаты лежат в пути `/var/snap/microk8s/current/certs`)
+```shell
+export TOKEN=<token>
+curl --cacert 08-rbac/ca.crt --header "Authorization: Bearer ${TOKEN}" -X GET https://<IP_address>:16443/api 
+```
+- то, что данный токен временный можно убедиться расшифровав его на сайте [jwt.io](https://jwt.io/). Видим, что expiration time через 1 час
+- для того, чтобы иметь постоянный токен, необходимо сделать объект secret
+```shell
+kubectl apply -f 08-rbac/80_secret.yaml
+kubectl describe sa netology-sa -n lesson8
+```
+- теперь можно создать под с использованием этого SA и обратиться к API кластера из пода
+```shell
+kubectl apply -f 08-rbac/81_pod_multitool_sa.yaml
+kubectl exec -n lesson8 pod-multitool-default -- ls -la /var/run/secrets/kubernetes.io/serviceaccount
+```
+- теперь можно использовать этот токен для запроса к API.
+```shell
+kubectl exec -n lesson8 pod-multitool-default -it -- bash
+curl --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
+    --header "Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+    -X GET https://<IP_address>:16443/api
+```
+
+------
+### User Account
+- создадим сертификат вручную с именем `test` и группой `ops` и подпишем CA
+```shell
+openssl genrsa -out test.key 2048
+openssl req -new -key test.key -out test.csr -subj "/CN=test/O=ops"
+openssl x509 -req -in test.csr -CA 08-rbac/ca.crt -CAkey 08-rbac/ca.key -CAcreateserial -out test.crt -days 10
+cat test.crt
+```
+- получим сертификат, который можно использовать для подключения к кластеру
+```shell
+kubectl config set-credentials test --client-certificate test.crt --client-key test.key --embed-certs=true
+kubectl config view
+```
+- создадим новый контекст к текущему кластеру с новыми кредами
+```shell
+kubectl config set-context test --cluster=microk8s-cluster --user=test
+kubectl config use-context test
+kubectl get nodes
+```
+
+- то же самое можно делать с помощью API k8s и объекта типа `CertificateSigningRequest`
+- для этого надо сгенерировать CSR и отправить в кластер запрос
+```shell
+openssl genrsa -out test2.key 2048
+openssl req -new -key test2.key -out test2.csr -subj "/CN=test2/O=ops"
+cat test2.csr | base64
+```
+```yaml
+apiVersion: certificates.k8s.io/v1
+kind: CertificateSigningRequest
+metadata:
+  name: super-csr
+spec:
+  groups:
+  - system:authenticated
+  request: {BASE64_csr}
+  expirationSeconds: 86400  # one day
+  usages:
+  - client auth
+  signerName: kubernetes.io/kube-apiserver-client
+```
+```shell
+kubectl apply -f 08-rbac/82_csr.yaml
+kubectl get csr
+```
+- аппрувнем запрос
+```shell
+kubectl certificate approve super-csr
+kubectl get csr
+```
+- заберем сертификат
+```shell
+kubectl get csr super-csr -o jsonpath={.status.certificate} | base64 --decode
+```
+
+### Role, RoleBinding
+
 
 </details>

@@ -57,31 +57,9 @@ spec:
   signerName: kubernetes.io/kube-apiserver-client
 ```
 
-------
-```shell
-kubectl create sa netology
-kubectl create token netology
-kubectl apply -f secret.yaml
-kubectl describe secret token
-export TOKEN=""
-curl --cacert 08-rbac/ca.crt --header "Authorization: Bearer ${TOKEN}" -X GET https://158.160.96.174:16443/api 
-```
-
-## Create user
-openssl genrsa -out test.key 2048
-# create CSR
-openssl req -new -key test.key -out test.csr -subj "/CN=test/O=ops"
-# sign CSR
-openssl x509 -req -in test.csr -CA 08-rbac/ca.crt -CAkey 08-rbac/ca.key -CAcreateserial -out test.crt -days 10
-# create k8s config
-kubectl config set-credentials test --client-certificate test.crt --client-key test.key --embed-certs=kubecttrue
-kubectl config set-context test --cluster=microk8s-cluster --user=test
-
-
 ###
 kubectl get csr
 kubectl certificate approve ssl-csr
 kubectl get csr ssl-csr -o jsonpath={.status.certificate} | base64 --decode > cert.crt
 
-
-
+kubectl api-resources

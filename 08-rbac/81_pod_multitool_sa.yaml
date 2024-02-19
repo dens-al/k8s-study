@@ -8,4 +8,4 @@ spec:
     - name: network-multitool
       image: wbitt/network-multitool
 ## https://github.com/wbitt/Network-MultiTool
-  serviceAccountName: netology
+  serviceAccountName: netology-sa

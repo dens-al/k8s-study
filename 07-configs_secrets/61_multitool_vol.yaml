@@ -19,28 +19,3 @@ spec:
     - name: secret-volume
       secret:
         secretName: my-secret
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: my-configmap
-  namespace: lesson7
-data:
-  key1: "Hello netology guys! In god we trust"
-  key3: value2
-  key2: |
-    Test
-    multiple lines
-    more lines
-    some more lines
-    need more lines
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: my-secret
-  namespace: lesson7
-type: Opaque
-data:
-  username: aGVsbG8K #YWRtaW4K # admin
-  password: bmV0b2xvZ3kK # netology
