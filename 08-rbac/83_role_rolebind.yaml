@@ -17,12 +17,12 @@ metadata:
   name: pod-reader-rb
   namespace: lesson8
 subjects:
-#  - kind: User
-#    name: vasya
-#    apiGroup: rbac.authorization.k8s.io
-  - kind: Group
-    name: dev
+  - kind: User
+    name: vasya
     apiGroup: rbac.authorization.k8s.io
+#  - kind: Group
+#    name: ops
+#    apiGroup: rbac.authorization.k8s.io
 roleRef:
   kind: Role
   name: pod-reader
