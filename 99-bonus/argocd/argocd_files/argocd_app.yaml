@@ -10,7 +10,7 @@ spec:
 
   source:
     repoURL: https://github.com/dens-al/k8s-study.git
-    targetRevision: master
+    targetRevision: main
     path: 99-bonus/argocd/demo-app
   destination:
     server: https://kubernetes.default.svc
