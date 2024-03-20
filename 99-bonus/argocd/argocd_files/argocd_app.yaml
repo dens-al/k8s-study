@@ -12,9 +12,11 @@ spec:
     repoURL: https://github.com/dens-al/k8s-study.git
     targetRevision: main
     path: 99-bonus/argocd/demo-app
+
   destination:
     server: https://kubernetes.default.svc
     namespace: my-super-app
+
   syncPolicy:
     automated:             # automated sync by default retries failed attempts 5 times with following delays between attempts ( 5s, 10s, 20s, 40s, 80s ); retry controlled using `retry` field.
       prune: true          # Specifies if resources should be pruned during auto-syncing ( false by default ).

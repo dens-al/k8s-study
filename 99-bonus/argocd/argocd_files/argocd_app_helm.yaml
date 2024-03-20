@@ -10,35 +10,29 @@ spec:
 
   source:
     repoURL: https://github.com/dens-al/k8s-study.git
-    targetRevision: master
-    path: 99-bonus/argocd/demo-helm
+    targetRevision: main
+    path: 99-bonus/argocd/demo-helm/app
 
     helm:
       parameters:
       - name: "service.port"
         value: "8082"
-      # - name: "replicaCount"
-      #   value: "4"
-
-      # Helm values files for overriding values in the helm chart
-      # The path is relative to the spec.source.path directory defined above
-      valueFiles:
-      - values-dev.yaml
-
-      # Values file as block file
-      values: |
-        # replicaCount: 2
-        serviceAccount:
-          create: true
-          annotations:
-            demo/role: demo-annotation
-          name: sa-custom-name
+      - name: "replicaCount"
+        value: "4"
+#      valueFiles:
+#      - values-dev.yaml
+#      values: |
+#        # replicaCount: 2
+#        serviceAccount:
+#          create: true
+#          annotations:
+#            demo/role: demo-annotation
+#          name: sa-custom-name
 
   destination:
     server: https://kubernetes.default.svc
     namespace: my-super-app
 
-  # Sync policy
   syncPolicy:
     automated:
       prune: true
