@@ -801,3 +801,154 @@ kubectl apply -f 08-rbac/84_rolebind.yaml
 - переключимся на контекст пользователя и убедимся, что права есть
 
 </details>
+
+
+<details>
+  <summary>Lesson 9. Helm</summary>
+
+### Helm as Packet Manager
+
+- список всех подключенных репозиториев
+
+```shell
+helm repo list
+```
+
+- имеется поиск приложений по всем репозиториям
+
+```shell
+helm search repo nginx
+```
+
+- установим nginx из репозитория bitnami
+
+```shell
+helm install web bitnami/nginx
+```
+
+- список установленных приложений по всем namespace
+
+```shell
+helm list -A
+```
+
+- эмуляция установки
+
+```shell
+helm install web bitnami/nginx --dry-run
+```
+
+```shell
+helm status web
+```
+
+```shell
+helm upgrade --install web bitnami/nginx
+```
+
+```shell
+helm upgrade --install web bitnami/nginx --namespace web
+```
+
+```shell
+helm upgrade --install web bitnami/nginx --namespace web --create-namespace
+```
+
+```shell
+helm pull bitnami/nginx
+```
+
+</details>
+
+<details>
+  <summary>Lesson 12. Network in k8s</summary>
+
+### Таблица маршрутизации
+
+- таблица на нодах
+
+```shell script
+route -n
+ip -a
+ip -r
+```
+
+- таблица на flannel
+
+```shell script
+brctl show
+```
+
+- установим какой-нибудь деплоймент на большое кол-во реплик
+
+```shell
+kaf 02-deployments/32_dpl_svc_multitool.yaml
+```
+
+-
+- посмотрим маршруты и сетевые интерфейсы на нодах
+
+```shell
+route -n
+ip -a
+ip -r
+brctl show
+kubectl get po -o wide
+```
+
+- kube-proxy создает правила iptables
+
+```shell script
+iptables -t nat -vnL
+# Удаление всех правил iptables. Не выполнять на production кластерах
+iptables -F
+# Через некоторое время правила будут созданы заново
+iptables -t nat -vnL
+```
+
+- примерное количество подов запущенных на ноде:
+
+```shell script
+ip a | grep veth | wc -l
+```
+
+- можно сверить
+
+```shell script
+kubectl get po -A -o wide | grep node1 | wc -l
+```
+
+### Network policies
+
+- создадим под
+
+```shell
+kubectl run nginx --image=nginx --labels="app=web"
+kubectl expose pod/nginx --port=80
+sleep 20
+kubectl get pods --show-labels
+```
+
+```shell
+kubectl run my-curl-pod --image=curlimages/curl -it --rm -- sh 
+```
+
+- установим политику по умолчанию запретить все
+
+```shell
+kaf 11-networking/network-policy.yaml
+```
+
+- проверим что доступа нет
+
+```shell
+kubectl run my-curl-pod --image=curlimages/curl -it --rm -- sh
+```
+
+- проверим, что доступ появился
+
+```shell
+kubectl run my-curl-pod --image=curlimages/curl --labels="app=curl" -it --rm -- sh
+```
+
+</details>

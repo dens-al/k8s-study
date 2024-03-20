@@ -2,9 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: app-multitool
-  namespace: lesson4
 spec:
-  replicas: 5
+  replicas: 3
   selector:
     matchLabels:
       app: myapp
@@ -16,15 +15,3 @@ spec:
       containers:
         - image: praqma/network-multitool:alpine-extra
           name: multitool
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: app-svc
-  namespace: lesson4
-spec:
-  ports:
-    - name: app
-      port: 80
-  selector:
-    app: myapp
