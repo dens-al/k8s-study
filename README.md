@@ -307,8 +307,11 @@ kubectl get ep -n lesson3
 ```
 
 - создается сетевой балансировщик автоматически в клауде и можно постучаться на публичный адрес
+- В случае ЯО можем убедиться, что балансировщик создался:
+```shell
+yc load-balancer network-load-balancer list --folder-name netology
+```
 - при этом под капотом создается сервис типа NodePort
-
 ```shell
 kubectl describe svc -n lesson3 svc-multitool-lb | grep NodePort
 ```
